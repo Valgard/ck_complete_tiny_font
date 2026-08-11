@@ -23,6 +23,17 @@ namespace CompleteTinyFont
     /// it to the atlas's 12 px cell height would grow every line gap in existing
     /// mod UIs by 2 px.</para>
     ///
+    /// <para>The rect passed to <c>InitCodePoints()</c> is one row taller than the
+    /// drawn glyph (<c>RectH</c> = <c>BoxH</c> + 2, not <c>BoxH</c>): CK derives
+    /// every sprite from <c>rect2 = (rect.y + 1, rect.height - 1)</c>, discarding
+    /// the rect's bottom row, so a rect that exactly matched the drawn glyph would
+    /// drop its own last row (this is what made every glyph render 1 px low
+    /// before the 2026-08-12 master shift). Padding the rect by that one row
+    /// makes the sprite cover cell rows 0..10 — the ten drawn rows plus one
+    /// blank row — with the pivot at 5/11, landing the glyph's bottom 2 px below
+    /// it: exactly vanilla's value (vanilla: floor(9/2) - 2 = 2; ours: floor(11/2)
+    /// - 3 = 2).</para>
+    ///
     /// <para>All 114 previous codepoints are a strict subset of the 331 shipped
     /// here, so nothing CK renders today loses its glyph.</para>
     /// </summary>
@@ -34,7 +45,8 @@ namespace CompleteTinyFont
         private const int Cols = 32;
         private const int CellW = 8;
         private const int CellH = 12;
-        private const int BoxH = 10; // glyph box height inside a 12px cell (y = 1..10)
+        private const int BoxH = 10; // drawn glyph rows inside a cell (rows 0..9 since the 2026-08-12 master shift)
+        private const int RectH = 12; // BoxH + 2: one row CK discards (rect2 = y+1, h-1), one to put the pivot on vanilla's baseline
         private const int AtlasH = 144;
         private const int Cells = 384; // == PugFont.latinCharset.Length
 
@@ -116,9 +128,10 @@ namespace CompleteTinyFont
                 {
                     int col = i % Cols;
                     int row = i / Cols;
-                    // y flipped to Unity's bottom-left origin; the box sits on
-                    // rows 1..10 of the cell, so its bottom edge is row*12 + 11.
-                    g.rect = new RectInt(col * CellW, AtlasH - (row * CellH + BoxH + 1), w, BoxH);
+                    // y flipped to Unity's bottom-left origin. The rect is one
+                    // row taller than the drawn glyph (RectH = BoxH + 2, not
+                    // BoxH) — see the class doc comment for why.
+                    g.rect = new RectInt(col * CellW, AtlasH - (row * CellH + RectH), w, RectH);
                 }
                 // An empty cell keeps its default zero-size rect, which
                 // InitCodePoints skips — that is how the charset's spaces and
