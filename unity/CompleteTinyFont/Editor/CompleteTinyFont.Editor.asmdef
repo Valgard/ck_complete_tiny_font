@@ -1,0 +1,22 @@
+{
+    "name": "CompleteTinyFont.Editor",
+    "rootNamespace": "CompleteTinyFont.Editor",
+    "references": [
+        "CompleteTinyFont",
+        "ModSDK.Editor",
+        "PugMod.SDK"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "modio.UnityPlugin.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
