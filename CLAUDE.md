@@ -206,23 +206,36 @@ document (`sources/thinTiny-review.md`) live in this repo — relocated from
 Regenerate this mod's shipped atlas and kerning matrix from that master with:
 
 ```bash
-python3 utils/pixaki_to_glyphs.py \
+uv run utils/pixaki_to_glyphs.py \
   --pixaki complete-tiny-font/sources/thinTiny.pixaki \
   --sheet complete-tiny-font/unity/CompleteTinyFont/Art/thinTiny_full.png \
   --kerning complete-tiny-font/unity/CompleteTinyFont/Art/thinTiny_kerning.bytes
 ```
 
 Run from the parent `core_keeper/` directory — the tool is shared across
-mods, not vendored here. `--check-only` (in place of `--sheet`/`--kerning`)
-validates the master without writing anything; the current master reports
-`OK — 337 painted cells, all invariants hold`. Those invariants are the rect
-box's geometry, the one-to-one match between boxes and painted cells, and —
-since the ink-containment check was added — that no glyph paints outside its
-own advance width or below its box, which the kerning pass would otherwise
-clip silently and then measure the truncated glyph. The `Widths` string in
-`ThinTinyFontPatch.cs` is generated output too — regenerate and re-paste it
-from the same master rather than hand-editing a digit; see that class's own
-doc comment for what each digit encodes.
+mods, not vendored here. Through `uv`, not bare `python3`: the parent is a uv
+project pinning Pillow exactly, and regenerating with a different Pillow
+changes the PNG's bytes without changing a pixel, which defeats the
+byte-identity check this mod's artifacts are verified by.
+
+`--check-only` (in place of `--sheet`/`--kerning`) validates the master
+without writing anything; the current master reports `OK — 337 painted cells,
+all invariants hold`. Four invariants: the rect box's geometry, the
+one-to-one match between boxes and painted cells, that no glyph paints
+outside its own advance width or below its box (which the kerning pass would
+otherwise clip silently, then measure the truncated glyph), and that the last
+column's advance leaves room for the 2 px outline padding CK adds — at x=248
+on a 257 px canvas that caps it at 6, and exceeding it costs an error log line
+per glyph on every launch.
+
+The `Widths` string in `ThinTinyFontPatch.cs` is generated output too —
+regenerate and re-paste it from the same master rather than hand-editing a
+digit; see that class's own doc comment for what each digit encodes. Forgetting
+the paste used to be invisible, so it is now a gate: this repo's
+`pre-commit` runs the parent's `utils/tests/test_shipped_artifacts.py` whenever
+the master, either binary artifact or that `.cs` changes, and it compares all
+three against a fresh regeneration. Cloned standalone, without the parent
+beside it, the hook prints that it skipped rather than passing quietly.
 
 `sources/glyph-templates/` holds the reference material for glyph work: two
 tracked tools (`dump_log_to_json.py`, `build_glyph_grids.py`) and, beside

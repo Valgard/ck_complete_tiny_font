@@ -39,7 +39,7 @@ cells of 8×12 px) is hardcoded, derived once from that dump and now stable.
 overlays. Regenerate the atlas from the parent `core_keeper/` directory:
 
 ```bash
-python3 utils/pixaki_to_glyphs.py \
+uv run utils/pixaki_to_glyphs.py \
   --pixaki complete-tiny-font/sources/thinTiny.pixaki \
   --sheet complete-tiny-font/unity/CompleteTinyFont/Art/thinTiny_full.png \
   --kerning complete-tiny-font/unity/CompleteTinyFont/Art/thinTiny_kerning.bytes
