@@ -110,6 +110,15 @@ namespace CompleteTinyFont
                 return;
             try
             {
+                // Manager.text is main._textManager, and neither hop is null-checked by CK,
+                // so reaching it before the Manager singleton exists throws instead of
+                // bailing — and the catch below would report that benign "too early" launch
+                // order as a font failure. On a client the order is guaranteed (mods are
+                // initialised from Manager.InitializeManagers, after _instance is set), but
+                // nothing about this patch's two entry points guarantees it elsewhere.
+                if (Manager.main == null)
+                    return;
+
                 var tm = Manager.text;
                 var f = tm != null ? tm.thinTiny : null;
                 if (f == null)
