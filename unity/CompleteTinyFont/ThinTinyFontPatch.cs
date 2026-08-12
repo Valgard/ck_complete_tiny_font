@@ -64,12 +64,17 @@ namespace CompleteTinyFont
         private const string AssetPath = "Assets/CompleteTinyFont/Art/thinTiny_full.png";
         private const string KerningAssetPath = "Assets/CompleteTinyFont/Art/thinTiny_kerning.bytes";
 
+        // Atlas geometry. These are the same numbers utils/pixaki_to_glyphs.py lays the
+        // master out with (COLS, CDX/CDY, ATLAS_W, BOX_H there) and the generator refuses
+        // to emit any other canvas — but nothing on this side of the pipeline enforces
+        // that, so TryApply() re-checks the loaded texture against AtlasW/AtlasH.
         private const int Cols = 32;
         private const int CellW = 8;
         private const int CellH = 12;
         private const int BoxH = 10; // drawn glyph rows inside a cell (rows 0..9 since the 2026-08-12 master shift)
         private const int RectH = 12; // BoxH + 2: one row CK discards (rect2 = y+1, h-1), one to put the pivot on vanilla's baseline
         private const int AtlasH = 144;
+        private const int AtlasW = Cols * CellW + 1; // the +1 column exists only for PugFont's outline-padding check
         private const int Cells = 384; // == PugFont.latinCharset.Length
 
         /// <summary>
@@ -121,7 +126,25 @@ namespace CompleteTinyFont
                     return;
                 }
 
-                f.texture = sheet.texture;
+                // Every rect BuildGlyphData produces is derived from AtlasW/AtlasH at compile
+                // time, so a texture of any other size puts all of them on the wrong rows.
+                // A larger one keeps them in bounds and renders 331 wrong-but-valid glyphs
+                // while still logging success; a smaller one makes Sprite.Create throw
+                // inside InitCodePoints, half-way through a swap that has already replaced
+                // the font's texture and charset. Refuse before the first mutation instead,
+                // so thinTiny simply stays vanilla. Only an edit to the atlas's .meta (or a
+                // taller master) can trigger this — the generator hard-exits on any other
+                // canvas — which is why one log line, not a fallback, is the whole handling.
+                var texture = sheet.texture;
+                if (texture.width != AtlasW || texture.height != AtlasH)
+                {
+                    Debug.LogError(
+                        $"[{CompleteTinyFontMod.Name}] atlas is {texture.width}x{texture.height}, expected {AtlasW}x{AtlasH}; leaving thinTiny untouched"
+                    );
+                    return;
+                }
+
+                f.texture = texture;
                 f._customCharset = null; // -> PugFont.latinCharset, the order the atlas is drawn in
                 f.charDims = new Vector2Int(CellW, BoxH); // layout metric: unchanged from vanilla
                 f.glyphData = BuildGlyphData(Math.Min(f.charset.Length, Cells));

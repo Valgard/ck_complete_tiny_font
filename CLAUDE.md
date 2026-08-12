@@ -74,6 +74,17 @@ its characters, so charset position, glyph index and atlas cell are one and
 the same coordinate: cell `i` is glyph `i` is `latinCharset[i]`. No separate
 glyph-index table is needed anywhere in the C#.
 
+The canvas is therefore **257×144**, not 256×144: `Cols × CellW` plus one spare
+column, which `PugFont.InitCodePoints` needs for the 2 px outline padding it
+adds to the last column's glyphs. Someone redrawing the master from scratch
+otherwise meets that requirement as a hard exit from the generator, which
+refuses any other canvas size. The C# checks the same two numbers against the
+texture it just loaded (`AtlasW`/`AtlasH`) and refuses the swap on a mismatch,
+because every glyph rect is derived from them: a *larger* texture would keep
+all 331 rects in bounds and render wrong-but-valid glyphs while still logging
+success, and a *smaller* one would throw out of `InitCodePoints` half-way
+through the swap, leaving `thinTiny` worse than vanilla.
+
 337 of the 384 cells are painted; 6 of those hold controller-button glyphs that
 never reach the screen, leaving 331 characters that actually render — the number
 quoted everywhere else in this mod's docs.
