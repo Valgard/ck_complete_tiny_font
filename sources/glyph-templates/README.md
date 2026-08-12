@@ -58,5 +58,5 @@ row 0, glyph-specific width), **Dims** = the nominal-cell checkerboard, **Backgr
 cyan, plus a `Layer 1` helper strip. The thinSmall reference layer the master started with
 was removed in revision 2 — comparisons run against `rrsthin8_raw.png` instead. Extraction
 maps each codepoint to its thinSmall cell (col = x//8, row from top). The file format is
-documented in `item-checklist/docs/research/pixaki-format.md` (it predates this repo and
-still serves that mod's own Pixaki sprite pipeline).
+documented in `core_keeper/docs/pixaki-format.md`, shared by the family because both
+Pixaki pipelines read it.
