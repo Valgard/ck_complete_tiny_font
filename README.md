@@ -24,9 +24,14 @@ No dependencies, no configuration — subscribe and it works.
 
 The game uses this font for the small numbers on slots — item counts in your
 inventory and in recipe lists, stack sizes on items lying on the ground — and
-for score text. Those become one pixel flatter; their spacing is unchanged.
-Everything else the mod affects is text that previously could not render at
-all.
+for score text. Those become one pixel flatter and keep the original's exact
+widths, so nothing numeric moves. Everything else the mod affects is text that
+previously could not render at all.
+
+Letters are a different matter: 25 of the characters the original had are a
+pixel or two wider here, most visibly `m` and `M`. Vanilla barely uses this
+font for letters, so you are unlikely to see it — but a mod with letter labels
+in the small font may find them reflowing.
 
 ## Safe to add and remove
 

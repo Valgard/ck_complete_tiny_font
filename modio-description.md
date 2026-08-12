@@ -19,8 +19,9 @@ punctuation, all drawn to match the original's proportions.
 - Fixes every accented or Cyrillic character the small font previously
   couldn't render at all — those used to silently borrow a glyph from the
   Chinese font, at the wrong metric and visibly deformed.
-- Keeps the original's spacing: existing glyphs render one pixel flatter,
-  nothing shifts sideways.
+- Digits keep the original's exact widths, so counters and stack labels stay
+  put; they render one pixel flatter. Letters are redrawn too, and 25 of them
+  are a pixel or two wider (most visibly `m` and `M`).
 
 ## What changes visibly
 
