@@ -71,6 +71,26 @@ that are intentionally left unmapped (their `Widths` digit is `'0'`, the same
 marker used for a genuinely empty cell), leaving 331 characters that actually
 render — the number quoted everywhere else in this mod's docs.
 
+### Where `thinTiny` actually renders
+
+Exactly **14** shipped assets use this font: the seven inventory/progress
+slot prefabs, `RecipeSlot`, `RecipeCategorySlot`, `BossStatueRecipeSlot`,
+`DroppedItem` (the stack-size label on an item lying on the ground),
+`ConditionUI`, the score-text prefab, and the main-manager prefab.
+
+**Damage numbers are not among them.** `CombatText.prefab` uses `thinSmall`,
+not `thinTiny`, and CK's own `isDamageNumber → SetDefaultFont(thinTiny)`
+branch is inert: rendering reads `style.fontFace`, that setter only ever
+writes `defaultStyle.fontFace`, and the one copy between the two runs the
+other way — `defaultStyle = style.GetCopy()`, in `Awake()`. The branch sets a
+field nothing downstream ever reads.
+
+Worth pinning down explicitly: this is the single most error-prone fact about
+this mod. An earlier draft of this project's own documentation claimed damage
+numbers were affected, and a sibling mod's `CLAUDE.md` still carries that
+claim in one of its historical entries. Anyone extending this mod should find
+the correct scope here, next to the code, rather than rediscovering it.
+
 ### Why `charDims` stays `(8, 10)` while the atlas cell is 12 px tall
 
 `charDims` is a layout metric only — line advance, reported text
@@ -112,13 +132,14 @@ matrix; it was removed once this was understood — see git history around
 
 ### Regenerating the atlas and kerning matrix
 
-The Pixaki master (`thinTiny.pixaki`) and its 12-revision review document
-currently live in the `item-checklist` repo — a later step moves both here.
+The Pixaki master (`sources/thinTiny.pixaki`) and its 12-revision review
+document (`sources/thinTiny-review.md`) live in this repo — relocated from
+`item-checklist`, where the glyph set originated before this mod existed.
 Regenerate this mod's shipped atlas and kerning matrix from that master with:
 
 ```bash
 python3 utils/pixaki_to_glyphs.py \
-  --pixaki item-checklist/sources/thinTiny.pixaki \
+  --pixaki complete-tiny-font/sources/thinTiny.pixaki \
   --sheet complete-tiny-font/unity/CompleteTinyFont/Art/thinTiny_full.png \
   --kerning complete-tiny-font/unity/CompleteTinyFont/Art/thinTiny_kerning.bytes
 ```
@@ -147,13 +168,14 @@ When publishing, `../utils/upload.sh` uses the shared
 every sibling mod: the version comes from the topmost `## [x.y.z]` entry of
 `CHANGELOG.md`. `CK_MODIO_TYPE` is `Visual|Language|Library`. `requiredOn` is
 `1` (Client) — this mod only changes client-side text rendering, so a server
-lacking it must never block a join. The profile logo goes at
-`unity/CompleteTinyFont/Editor/logo.png` — a 1024×1024 transparent PNG made
-with the family logo pipeline (parent `../CLAUDE.md` § Logo / branding); the
-scaffold's placeholder there is still the default 64×64 grey square as of
-this writing, and `CLIPublishHelper` only rejects a *missing* logo asset,
-never a placeholder one, so replacing it before publishing is on the critical
-path, not optional polish.
+lacking it must never block a join. The profile logo at
+`unity/CompleteTinyFont/Editor/logo.png` is a 1024×1024 transparent PNG made
+with the family logo pipeline (parent `../CLAUDE.md` § Logo / branding) — a
+hand-painted type-case tray with glowing gold characters, replacing the
+scaffold's original 64×64 grey placeholder. Worth remembering for any future
+mod: `CLIPublishHelper` only rejects a *missing* logo asset, never a
+placeholder one, so a real logo has to be swapped in deliberately before
+publishing — it is never caught for you.
 
 ## Conventions
 
