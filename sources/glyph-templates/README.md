@@ -14,7 +14,7 @@ CK atlases (`rrs*_raw.png`, `*_view.png`, …), `glyph_metrics.json`, and `grids
 
 | Face | Atlas (`texName`) | Size | Glyphs | has `ö`/`Ä`/`ß`? |
 |---|---|---|:---:|:---:|
-| **`thinTiny`** | `rrs5` | 256×40 | 114 | no (digits-only face) |
+| **`thinTiny`** | `rrs5` | 256×40 | 114 | no (basic Latin only, no accents) |
 | `thinSmall` | `rrsthin8` | 257×144 | 331 | yes |
 | `thinMedium` | `rrs10thin` | 513×192 | 331 | yes |
 | `boldSmall` | `rrs8` | 257×144 | 331 | yes |

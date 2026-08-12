@@ -66,10 +66,18 @@ its characters, so charset position, glyph index and atlas cell are one and
 the same coordinate: cell `i` is glyph `i` is `latinCharset[i]`. No separate
 glyph-index table is needed anywhere in the C#.
 
-337 of the 384 cells are painted; 6 of those hold controller-button glyphs
-that are intentionally left unmapped (their `Widths` digit is `'0'`, the same
-marker used for a genuinely empty cell), leaving 331 characters that actually
-render — the number quoted everywhere else in this mod's docs.
+337 of the 384 cells are painted; 6 of those hold controller-button glyphs that
+never reach the screen, leaving 331 characters that actually render — the number
+quoted everywhere else in this mod's docs.
+
+The reason those six drop out is the charset, not the width table: they sit at
+`latinCharset[2..7]`, which is `U+0020` six times over, and `InitCodePoints`
+skips `' '`. CK reaches its own controller glyphs by glyph *index* instead, which
+a codepoint-based replacement cannot address. Their `Widths` digits are `'7'`,
+not `'0'` — a painted cell can never carry `'0'`, because the digit comes from
+the magenta rect box and `validate()` rejects any glyph pixels without one.
+Anyone "tidying" those six digits to `'0'` would change the generated `Widths`,
+break byte-identical regeneration and drop six kerning rows.
 
 ### Where `thinTiny` actually renders
 
@@ -87,9 +95,10 @@ field nothing downstream ever reads.
 
 Worth pinning down explicitly: this is the single most error-prone fact about
 this mod. An earlier draft of this project's own documentation claimed damage
-numbers were affected, and a sibling mod's `CLAUDE.md` still carries that
-claim in one of its historical entries. Anyone extending this mod should find
-the correct scope here, next to the code, rather than rediscovering it.
+numbers were affected, and the claim still survives — deliberately frozen, with
+its correction alongside — in `item-checklist/docs/iteration-history.md`, which
+records what was believed at the time. Anyone extending this mod should find the
+correct scope here, next to the code, rather than rediscovering it.
 
 ### Why `charDims` stays `(8, 10)` while the atlas cell is 12 px tall
 
@@ -97,15 +106,17 @@ the correct scope here, next to the code, rather than rediscovering it.
 dimensions — not atlas geometry. Raising it to the atlas's 12 px cell height
 would grow every line gap in existing mod UIs by 2 px.
 
-The rect passed to `PugFont.InitCodePoints()` is deliberately one row taller
-than the drawn glyph (`RectH = BoxH + 2 = 12`, not `BoxH = 10`), because CK's
-own `InitCodePoints()` derives every sprite from `rect2 = (rect.y + 1,
+The rect passed to `PugFont.InitCodePoints()` is deliberately **two** rows
+taller than the drawn glyph (`RectH = BoxH + 2 = 12`, not `BoxH = 10`), because
+CK's own `InitCodePoints()` derives every sprite from `rect2 = (rect.y + 1,
 rect.height - 1)` — it discards the rect's bottom row unconditionally. A rect
 that exactly matched the drawn glyph would therefore drop its own last row
 (this is what made every glyph render 1 px low before the atlas's vertical
-shift). Padding the rect by that one blank row makes the sprite cover cell
-rows 0..10 — the ten drawn rows plus one blank — with the pivot landing at
-5/11. That puts the glyph's bottom edge 2 px below the pivot, which is
+shift). One of the two padding rows is discarded and one survives, so the
+*sprite* comes out one row taller than the glyph: cell rows 0..10 — the ten
+drawn rows plus one blank — with the pivot landing at 5/11. Do not read the
+"one row" of the sprite back into `RectH`; `RectH = BoxH + 1` reproduces the
+1-px-low bug. That puts the glyph's bottom edge 2 px below the pivot, which is
 exactly vanilla's own value: `floor(9/2) - 2 = 2` for vanilla's 9-row rect,
 `floor(11/2) - 3 = 2` for this build's 11-row one.
 
@@ -154,19 +165,23 @@ data. (An earlier revision did restore vanilla's real pairs on top of the
 generated matrix; it was removed once this was understood — see git history
 around `005617e`.)
 
-**Four variants were measured and rejected**, so nobody has to re-derive them. The percentage
-is agreement with vanilla's own kerning table — a calibration signal for the *rule*, never the
-acceptance criterion (see above):
+**Five variants were measured and rejected**, so nobody has to re-derive them. Read the
+percentages carefully: they are agreement with vanilla's own table over the 13,456 pairs
+where both fonts have a comparable value, and **all of them except the last were measured
+before the margin existed** — they are variations of the raw-gap rule, not of the shipped
+one. Agreement calibrated the *rule*; it was never the acceptance criterion (see above):
 
 | Variant | Agreement | Why rejected |
 |---|---|---|
-| raw gap, no margin (clamp 2) | 97.66 % | narrow stems touched in game — `lt`, `td` |
-| clamp 3, margin | 97.2 % | changes only 1,071 low-ink punctuation pairs, zero letters or digits — invisible in ordinary text |
-| clamp 4, margin | 97.5 % | same as clamp 3, more so |
-| neighbouring ink rows included in the gap | 89.5 % | looser and less predictable, with no collision it prevented |
-| no-overlap pairs default to 0 instead of the clamp | 97.42 % | glyphs that share no ink row get no air at all |
+| raw gap, clamp 2 — the original rule | 97.66 % | narrow stems touched in game — `lt`, `td` |
+| raw gap, clamp 3 or 4 | 97.2–97.5 % | worse agreement, and still no margin to prevent the collisions |
+| raw gap, neighbouring ink rows tolerated | 89.5 % | looser and less predictable, with no collision it prevented |
+| raw gap, no-overlap pairs default to 0 instead of the clamp | 97.42 % | glyphs sharing no ink row get no air at all |
+| **margin**, clamp 3 | not measured | changes only 1,071 low-ink punctuation pairs against the shipped rule, zero letters or digits — invisible in ordinary text, judged in game |
 
-The shipped rule (margin, clamp 2) agrees with vanilla on ~84 %.
+The shipped rule (margin, clamp 2) agrees with vanilla on ~84 %. Do not read the ~97 %
+rows as an argument for raising the clamp: they belong to a rule that has no margin at all,
+and the one clamp-3 variant that does carry the margin was rejected by looking at the game.
 
 **This rule is described three times** — this section, the class doc comment
 on `ThinTinyFontPatch` itself, and `kerning_pair()`'s own docstring in

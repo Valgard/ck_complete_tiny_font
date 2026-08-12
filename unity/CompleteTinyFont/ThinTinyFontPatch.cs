@@ -23,15 +23,16 @@ namespace CompleteTinyFont
     /// it to the atlas's 12 px cell height would grow every line gap in existing
     /// mod UIs by 2 px.</para>
     ///
-    /// <para>The rect passed to <c>InitCodePoints()</c> is one row taller than the
-    /// drawn glyph (<c>RectH</c> = <c>BoxH</c> + 2, not <c>BoxH</c>): CK derives
-    /// every sprite from <c>rect2 = (rect.y + 1, rect.height - 1)</c>, discarding
-    /// the rect's bottom row, so a rect that exactly matched the drawn glyph would
-    /// drop its own last row (this is what made every glyph render 1 px low
-    /// before the 2026-08-12 master shift). Padding the rect by that one row
-    /// makes the sprite cover cell rows 0..10 — the ten drawn rows plus one
-    /// blank row — with the pivot at 5/11, landing the glyph's bottom 2 px below
-    /// it: exactly vanilla's value (vanilla: floor(9/2) - 2 = 2; ours: floor(11/2)
+    /// <para>The rect passed to <c>InitCodePoints()</c> is two rows taller than
+    /// the drawn glyph (<c>RectH</c> = <c>BoxH</c> + 2, not <c>BoxH</c>): CK
+    /// derives every sprite from <c>rect2 = (rect.y + 1, rect.height - 1)</c>,
+    /// discarding the rect's bottom row, so a rect that exactly matched the drawn
+    /// glyph would drop its own last row (this is what made every glyph render
+    /// 1 px low before the 2026-08-12 master shift). Of the two padding rows, one
+    /// is discarded and one survives, so the <em>sprite</em> ends up one row
+    /// taller than the glyph: cell rows 0..10 — the ten drawn rows plus one blank
+    /// row — with the pivot at 5/11, landing the glyph's bottom 2 px below it:
+    /// exactly vanilla's value (vanilla: floor(9/2) - 2 = 2; ours: floor(11/2)
     /// - 3 = 2).</para>
     ///
     /// <para>All 114 previous codepoints are a strict subset of the 331 shipped
