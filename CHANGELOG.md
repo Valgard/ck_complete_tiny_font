@@ -11,6 +11,10 @@ reads the topmost `## [x.y.z]` entry as the version to publish.
   lowercase `l` immediately followed by `t` (e.g. "Seltenheit", "Entdeckt"),
   where the two stems touched directly. Spacing between letters now always
   leaves at least a sliver of air, even for the tightest pairs.
+- The same change made digit spacing uniform: the gap between two digits no
+  longer depends on which digits they are, so a multi-digit number keeps the
+  same total width as its digits change. Counters that tick — stack sizes,
+  slot counts — no longer shift a pixel back and forth while they count.
 
 ## [1.0.0] - 2026-08-11
 
