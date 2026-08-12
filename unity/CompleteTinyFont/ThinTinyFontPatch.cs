@@ -40,15 +40,22 @@ namespace CompleteTinyFont
     /// <para>Kerning: rebuilding <c>glyphData</c> also drops vanilla's
     /// <c>kerning</c> byte arrays, so text renders wider without a
     /// replacement. <see cref="ApplyKerning"/> loads a generated
-    /// <c>Cells x Cells</c> matrix, derived from this atlas's own ink columns
-    /// and calibrated against vanilla's table to 97.66%. It does NOT then
+    /// <c>Cells x Cells</c> matrix, derived from this atlas's own ink columns:
+    /// the smallest gap between two glyphs across their shared ink rows,
+    /// closed to one column short of touching rather than all the way --
+    /// closing it completely reproduces 97.66% of vanilla's own kerning table
+    /// but let narrow stems collide outright on this atlas's shapes (<c>l</c>
+    /// immediately followed by <c>t</c> touched in "Seltenheit"/"Entdeckt");
+    /// leaving that one column of air is what this shipped rule buys, at the
+    /// cost of matching only ~84% of vanilla's table instead. It does NOT then
     /// overwrite pairs with vanilla's real values, on purpose: kerning
     /// describes the side bearings of specific glyph shapes, and ours differ
     /// from vanilla's (digits are 5 px tall here vs. 6 in vanilla; <c>C E F
     /// L</c> are 3 px wide vs. 2). Vanilla's numbers are correct for vanilla's
     /// glyphs, not for these -- importing them would be systematically wrong,
-    /// not "more faithful". The 97.66% figure validates the generation rule
-    /// itself; it is not a reason to fall back to vanilla's data.</para>
+    /// not "more faithful". Either accuracy figure validates a generation
+    /// rule against vanilla's table; neither is a reason to fall back to
+    /// vanilla's data.</para>
     /// </summary>
     [HarmonyPatch(typeof(TextManager), "Init2")]
     internal static class ThinTinyFontPatch

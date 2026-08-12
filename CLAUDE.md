@@ -154,6 +154,13 @@ data. (An earlier revision did restore vanilla's real pairs on top of the
 generated matrix; it was removed once this was understood — see git history
 around `005617e`.)
 
+**This rule is described three times** — this section, the class doc comment
+on `ThinTinyFontPatch` itself, and `kerning_pair()`'s own docstring in
+`utils/pixaki_to_glyphs.py` — and it has already changed three times while a
+release landed in the middle of that history. All three need updating
+together whenever the rule changes again; a stale copy in the C# comment is
+exactly how the wrong accuracy figure ended up shipped once.
+
 ### Regenerating the atlas and kerning matrix
 
 The Pixaki master (`sources/thinTiny.pixaki`) and its 12-revision review
@@ -185,12 +192,14 @@ the cache is wiped.
 
 ## Publishing to mod.io
 
-Published — modId `6302514`, version `1.0.0`, in
-`unity/CompleteTinyFont/Editor/CompleteTinyFont_modio.asset`. The publish
-used the shared `CoreKeeperModUtils.CLIPublishHelper.Publish` Editor class
-the same way as every sibling mod (`../utils/upload.sh`): the version came
-from the topmost `## [x.y.z]` entry of `CHANGELOG.md`. `CK_MODIO_TYPE` is
-`Visual|Language|Library`. `requiredOn` is `1` (Client) — this mod only
+Published — modId `6302514`, currently at version `1.0.1`, in
+`unity/CompleteTinyFont/Editor/CompleteTinyFont_modio.asset` (`modId` is
+stable across releases; only the modfile behind it changes per version). The
+publish used the shared `CoreKeeperModUtils.CLIPublishHelper.Publish` Editor
+class the same way as every sibling mod (`../utils/upload.sh`): the version
+comes from the topmost `## [x.y.z]` entry of `CHANGELOG.md`, so each release
+needs that entry updated before publishing, not just the code. `CK_MODIO_TYPE`
+is `Visual|Language|Library`. `requiredOn` is `1` (Client) — this mod only
 changes client-side text rendering, so a server lacking it must never block
 a join. The profile logo at `unity/CompleteTinyFont/Editor/logo.png` is a
 1024×1024 transparent PNG made with the family logo pipeline (parent
@@ -201,9 +210,9 @@ rejects a *missing* logo asset, never a placeholder one, so a real logo has
 to be swapped in deliberately before publishing — it is never caught for
 you.
 
-The release is tagged `1.0.0` (annotated). `origin`
-(`git@github.com:Valgard/ck_complete_tiny_font.git`) carries `main` and that
-tag. `backup` is configured to point at the Forgejo host, but the repository
+Both releases are tagged (annotated `1.0.0` and `1.0.1`). `origin`
+(`git@github.com:Valgard/ck_complete_tiny_font.git`) carries `main` and both
+tags. `backup` is configured to point at the Forgejo host, but the repository
 does not exist there yet — it couldn't be created from the network reachable
 at publish time — so `backup` is currently a remote with nowhere to push
 to; create it there before relying on that remote.
