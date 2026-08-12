@@ -186,9 +186,10 @@ namespace CompleteTinyFont
                 {
                     int col = i % Cols;
                     int row = i / Cols;
-                    // y flipped to Unity's bottom-left origin. The rect is one
-                    // row taller than the drawn glyph (RectH = BoxH + 2, not
-                    // BoxH) — see the class doc comment for why.
+                    // y flipped to Unity's bottom-left origin. The rect is two
+                    // rows taller than the drawn glyph (RectH = BoxH + 2, not
+                    // BoxH); CK discards one of them, so the sprite ends up one
+                    // row taller — see the class doc comment for why.
                     g.rect = new RectInt(col * CellW, AtlasH - (row * CellH + RectH), w, RectH);
                 }
                 // An empty cell keeps its default zero-size rect, which
