@@ -161,21 +161,28 @@ the cache is wiped.
 
 ## Publishing to mod.io
 
-Not yet published — the real mod ID in
-`unity/CompleteTinyFont/Editor/CompleteTinyFont_modio.asset` is still `0`.
-When publishing, `../utils/upload.sh` uses the shared
-`CoreKeeperModUtils.CLIPublishHelper.Publish` Editor class the same way as
-every sibling mod: the version comes from the topmost `## [x.y.z]` entry of
-`CHANGELOG.md`. `CK_MODIO_TYPE` is `Visual|Language|Library`. `requiredOn` is
-`1` (Client) — this mod only changes client-side text rendering, so a server
-lacking it must never block a join. The profile logo at
-`unity/CompleteTinyFont/Editor/logo.png` is a 1024×1024 transparent PNG made
-with the family logo pipeline (parent `../CLAUDE.md` § Logo / branding) — a
-hand-painted type-case tray with glowing gold characters, replacing the
-scaffold's original 64×64 grey placeholder. Worth remembering for any future
-mod: `CLIPublishHelper` only rejects a *missing* logo asset, never a
-placeholder one, so a real logo has to be swapped in deliberately before
-publishing — it is never caught for you.
+Published — modId `6302514`, version `1.0.0`, in
+`unity/CompleteTinyFont/Editor/CompleteTinyFont_modio.asset`. The publish
+used the shared `CoreKeeperModUtils.CLIPublishHelper.Publish` Editor class
+the same way as every sibling mod (`../utils/upload.sh`): the version came
+from the topmost `## [x.y.z]` entry of `CHANGELOG.md`. `CK_MODIO_TYPE` is
+`Visual|Language|Library`. `requiredOn` is `1` (Client) — this mod only
+changes client-side text rendering, so a server lacking it must never block
+a join. The profile logo at `unity/CompleteTinyFont/Editor/logo.png` is a
+1024×1024 transparent PNG made with the family logo pipeline (parent
+`../CLAUDE.md` § Logo / branding) — a hand-painted type-case tray with
+glowing gold characters, replacing the scaffold's original 64×64 grey
+placeholder. Worth remembering for any future mod: `CLIPublishHelper` only
+rejects a *missing* logo asset, never a placeholder one, so a real logo has
+to be swapped in deliberately before publishing — it is never caught for
+you.
+
+The release is tagged `1.0.0` (annotated). `origin`
+(`git@github.com:Valgard/ck_complete_tiny_font.git`) carries `main` and that
+tag. `backup` is configured to point at the Forgejo host, but the repository
+does not exist there yet — it couldn't be created from the network reachable
+at publish time — so `backup` is currently a remote with nowhere to push
+to; create it there before relying on that remote.
 
 ## Conventions
 
