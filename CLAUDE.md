@@ -275,12 +275,10 @@ rejects a *missing* logo asset, never a placeholder one, so a real logo has
 to be swapped in deliberately before publishing — it is never caught for
 you.
 
-Both releases are tagged (annotated `1.0.0` and `1.0.1`). `origin`
-(`git@github.com:Valgard/ck_complete_tiny_font.git`) carries `main` and both
-tags. `backup` is configured to point at the Forgejo host, but the repository
-does not exist there yet — it couldn't be created from the network reachable
-at publish time — so `backup` is currently a remote with nowhere to push
-to; create it there before relying on that remote.
+Both releases are tagged (annotated `1.0.0` and `1.0.1`). Both remotes carry
+`main` and both tags: `origin`
+(`git@github.com:Valgard/ck_complete_tiny_font.git`) and `backup` on the
+Forgejo host. A push means both.
 
 ## Conventions
 
