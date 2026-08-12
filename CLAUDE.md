@@ -154,6 +154,20 @@ data. (An earlier revision did restore vanilla's real pairs on top of the
 generated matrix; it was removed once this was understood — see git history
 around `005617e`.)
 
+**Four variants were measured and rejected**, so nobody has to re-derive them. The percentage
+is agreement with vanilla's own kerning table — a calibration signal for the *rule*, never the
+acceptance criterion (see above):
+
+| Variant | Agreement | Why rejected |
+|---|---|---|
+| raw gap, no margin (clamp 2) | 97.66 % | narrow stems touched in game — `lt`, `td` |
+| clamp 3, margin | 97.2 % | changes only 1,071 low-ink punctuation pairs, zero letters or digits — invisible in ordinary text |
+| clamp 4, margin | 97.5 % | same as clamp 3, more so |
+| neighbouring ink rows included in the gap | 89.5 % | looser and less predictable, with no collision it prevented |
+| no-overlap pairs default to 0 instead of the clamp | 97.42 % | glyphs that share no ink row get no air at all |
+
+The shipped rule (margin, clamp 2) agrees with vanilla on ~84 %.
+
 **This rule is described three times** — this section, the class doc comment
 on `ThinTinyFontPatch` itself, and `kerning_pair()`'s own docstring in
 `utils/pixaki_to_glyphs.py` — and it has already changed three times while a
@@ -163,7 +177,7 @@ exactly how the wrong accuracy figure ended up shipped once.
 
 ### Regenerating the atlas and kerning matrix
 
-The Pixaki master (`sources/thinTiny.pixaki`) and its 12-revision review
+The Pixaki master (`sources/thinTiny.pixaki`) and its 13-revision review
 document (`sources/thinTiny-review.md`) live in this repo — relocated from
 `item-checklist`, where the glyph set originated before this mod existed.
 Regenerate this mod's shipped atlas and kerning matrix from that master with:
@@ -178,7 +192,11 @@ python3 utils/pixaki_to_glyphs.py \
 Run from the parent `core_keeper/` directory — the tool is shared across
 mods, not vendored here. `--check-only` (in place of `--sheet`/`--kerning`)
 validates the master without writing anything; the current master reports
-`OK — 337 painted cells, all invariants hold`. The `Widths` string in
+`OK — 337 painted cells, all invariants hold`. Those invariants are the rect
+box's geometry, the one-to-one match between boxes and painted cells, and —
+since the ink-containment check was added — that no glyph paints outside its
+own advance width or below its box, which the kerning pass would otherwise
+clip silently and then measure the truncated glyph. The `Widths` string in
 `ThinTinyFontPatch.cs` is generated output too — regenerate and re-paste it
 from the same master rather than hand-editing a digit; see that class's own
 doc comment for what each digit encodes.
