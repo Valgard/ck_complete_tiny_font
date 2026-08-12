@@ -37,7 +37,15 @@ idempotently on every run, so worktree switches and repo moves self-heal.
 `CoreKeeperModSDK` clone with a single `UnityLockfile`. If another session is
 building, wait for the lock to release — do not kill it.
 
-No automated tests. The cheapest check is the mod's own log line: after a
+No tests live in this repo, but two suites in the parent guard what ships from
+here: `utils/tests/test_shipped_artifacts.py` (this repo's `pre-commit` runs it
+— the atlas, the kerning matrix and the `Widths` constant must agree with the
+master) and `utils/tests/test_pixaki_to_glyphs.py` (the generator's own
+geometry and kerning rules). Run both with `uv run pytest utils/tests -q` from
+the parent. Neither can tell you whether the font *renders*, which is why the
+in-game check below still matters.
+
+The cheapest such check is the mod's own log line: after a
 build reloads, `Player.log` should show `[Complete Tiny Font] thinTiny
 replaced: 331 codepoints from a 257x144 atlas; kerning 337 rows`
 (`TryApply()` in `ThinTinyFontPatch.cs`). A missing or different-looking line

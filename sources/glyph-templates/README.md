@@ -51,6 +51,15 @@ MonoBehaviours have no TypeTree, so UnityPy can't read them statically). The Ite
 diagnostic block was removed when the fix shipped — see `dump_log_to_json.py`'s header
 for how to re-add it if the glyph set ever needs regenerating.
 
+**The `rrs*_raw.png` atlases come from the AssetRipper export**, not from a dump:
+`~/Projects/checkouts/CoreKeeperDecompile/Resources/Assets/Texture2D/<tex>.png`,
+copied to `<tex>_raw.png`. Verified pixel-for-pixel on 2026-08-12 for the two the
+review document's manual checks compare against — `rrs5_raw.png` (256×40, vanilla
+thinTiny) and `rrsthin8_raw.png` (257×144, thinSmall): identical to the export, no
+Y-flip, PNG bytes differ only because they were re-encoded. Worth stating because
+`glyph_metrics.json` had a documented route and these did not, which left the
+review document's most-used inputs unreproducible.
+
 ## Pixaki master layers (`thinTiny.pixaki`)
 
 **Atlas** = the glyph sprites, **Rects** = the per-glyph advance box (height 10 at cell
