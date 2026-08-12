@@ -9,3 +9,23 @@ repos:
             stages:
                 - pre-commit
                 - pre-push
+
+          # The atlas, the kerning matrix and the hand-pasted Widths constant
+          # must all come from the same revision of the Pixaki master, and
+          # nothing else in the build compares them. The guard is a test in the
+          # parent repo, where the generator lives, so this hook reaches across
+          # the repo boundary — and says so out loud when the parent is not
+          # there, which is the normal case for a standalone clone of this mod.
+          - id: artifacts-match-master
+            name: font artifacts match the Pixaki master
+            entry: >-
+                bash -c 'if [ -d ../utils/tests ]; then (cd .. && exec uv run --frozen
+                pytest utils/tests/test_shipped_artifacts.py -q); else echo "SKIPPED:
+                ../utils is absent (standalone clone), so the atlas/kerning/Widths
+                consistency guard did NOT run"; fi'
+            language: system
+            pass_filenames: false
+            files: ^(unity/CompleteTinyFont/Art/thinTiny_|unity/CompleteTinyFont/ThinTinyFontPatch\.cs|sources/thinTiny\.pixaki)
+            stages:
+                - pre-commit
+                - pre-push
