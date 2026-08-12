@@ -38,3 +38,9 @@ unity/CompleteTinyFont/Editor/CLIPublishHelper.cs
 unity/CompleteTinyFont/Editor/CLIPublishHelper.cs.meta
 unity/CompleteTinyFont/Editor/LocalizationGenerator.cs
 unity/CompleteTinyFont/Editor/LocalizationGenerator.cs.meta
+
+# Glyph tooling is tracked; extracted CK atlases + derived data
+# (glyph_metrics.json, grids/, *.png) stay untracked (Pugstorm game assets)
+sources/glyph-templates/*
+!sources/glyph-templates/*.py
+!sources/glyph-templates/README.md
