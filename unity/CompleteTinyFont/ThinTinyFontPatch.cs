@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using HarmonyLib;
 using UnityEngine;
 
@@ -41,11 +40,15 @@ namespace CompleteTinyFont
     /// <para>Kerning: rebuilding <c>glyphData</c> also drops vanilla's
     /// <c>kerning</c> byte arrays, so text renders wider without a
     /// replacement. <see cref="ApplyKerning"/> loads a generated
-    /// <c>Cells x Cells</c> matrix (from ink-column geometry, calibrated
-    /// against vanilla's own table to 97.66%) and then overwrites every pair
-    /// vanilla actually had with vanilla's real values -- captured from
-    /// <c>thinTiny</c> before this patch mutates it, since <c>InitCodePoints()</c>
-    /// clears <c>codePoints</c> and a live reference would read back empty.</para>
+    /// <c>Cells x Cells</c> matrix, derived from this atlas's own ink columns
+    /// and calibrated against vanilla's table to 97.66%. It does NOT then
+    /// overwrite pairs with vanilla's real values, on purpose: kerning
+    /// describes the side bearings of specific glyph shapes, and ours differ
+    /// from vanilla's (digits are 5 px tall here vs. 6 in vanilla; <c>C E F
+    /// L</c> are 3 px wide vs. 2). Vanilla's numbers are correct for vanilla's
+    /// glyphs, not for these -- importing them would be systematically wrong,
+    /// not "more faithful". The 97.66% figure validates the generation rule
+    /// itself; it is not a reason to fall back to vanilla's data.</para>
     /// </summary>
     [HarmonyPatch(typeof(TextManager), "Init2")]
     internal static class ThinTinyFontPatch
@@ -110,26 +113,17 @@ namespace CompleteTinyFont
                     return;
                 }
 
-                // Capture vanilla's own data before mutating anything below.
-                // A reference to f.glyphData survives the reassignment further
-                // down (the old array's GlyphData objects are untouched), but
-                // f.codePoints does not: InitCodePoints() clears it in place,
-                // so only a real copy still holds vanilla's char -> index map.
-                var oldGlyphs = f.glyphData;
-                var oldCodePoints = new Dictionary<char, int>(f.codePoints);
-
                 f.texture = sheet.texture;
                 f._customCharset = null; // -> PugFont.latinCharset, the order the atlas is drawn in
                 f.charDims = new Vector2Int(CellW, BoxH); // layout metric: unchanged from vanilla
                 f.glyphData = BuildGlyphData(Math.Min(f.charset.Length, Cells));
                 f.InitCodePoints(); // CK builds codePoints + volatileSprites itself
-                Applied = true;
 
-                ApplyKerning(f, bundle, oldGlyphs, oldCodePoints, out int rowsFilled, out int vanillaPairs);
+                ApplyKerning(f, bundle, out int rowsFilled);
+                Applied = true; // last mutation-completing statement: a throw above must not block a retry
 
                 Debug.Log(
-                    $"[{CompleteTinyFontMod.Name}] thinTiny replaced: {f.codePoints.Count} codepoints from a {f.texture.width}x{f.texture.height} atlas; "
-                        + $"kerning {rowsFilled} rows, {vanillaPairs} vanilla pairs restored"
+                    $"[{CompleteTinyFontMod.Name}] thinTiny replaced: {f.codePoints.Count} codepoints from a {f.texture.width}x{f.texture.height} atlas; kerning {rowsFilled} rows"
                 );
             }
             catch (Exception ex)
@@ -141,24 +135,13 @@ namespace CompleteTinyFont
 
         /// <summary>
         /// Loads the generated kerning matrix and applies it to every painted
-        /// glyph, then overwrites the pairs vanilla actually had with
-        /// vanilla's own values (its 114-codepoint table beats the generated
-        /// rule's 97.66% approximation for the characters both fonts share).
-        /// Best-effort: a missing or malformed asset logs a warning and
+        /// glyph. Best-effort: a missing or malformed asset logs a warning and
         /// leaves every glyph's <c>kerning</c> at its <see cref="BuildGlyphData"/>
         /// default (null, i.e. no correction) rather than throwing.
         /// </summary>
-        private static void ApplyKerning(
-            PugFont f,
-            AssetBundle bundle,
-            PugFont.GlyphData[] oldGlyphs,
-            Dictionary<char, int> oldCodePoints,
-            out int rowsFilled,
-            out int vanillaPairsRestored
-        )
+        private static void ApplyKerning(PugFont f, AssetBundle bundle, out int rowsFilled)
         {
             rowsFilled = 0;
-            vanillaPairsRestored = 0;
 
             var kerningAsset = bundle.LoadAsset<TextAsset>(KerningAssetPath);
             if (kerningAsset == null)
@@ -183,35 +166,6 @@ namespace CompleteTinyFont
                 Array.Copy(matrix, i * Cells, row, 0, Cells);
                 f.glyphData[i].kerning = row;
                 rowsFilled++;
-            }
-
-            foreach (var cEntry in oldCodePoints)
-            {
-                if (!f.codePoints.TryGetValue(cEntry.Key, out int newA))
-                    continue;
-                int oldA = cEntry.Value;
-                if (oldA < 0 || oldA >= oldGlyphs.Length)
-                    continue;
-                byte[] oldRow = oldGlyphs[oldA].kerning;
-                if (oldRow == null)
-                    continue;
-                byte[] newRow = f.glyphData[newA].kerning;
-                if (newRow == null)
-                    continue;
-
-                foreach (var dEntry in oldCodePoints)
-                {
-                    if (!f.codePoints.TryGetValue(dEntry.Key, out int newB))
-                        continue;
-                    int oldB = dEntry.Value;
-                    if (oldB < 0 || oldB >= oldRow.Length)
-                        continue;
-                    if (newB < 0 || newB >= newRow.Length)
-                        continue;
-
-                    newRow[newB] = oldRow[oldB];
-                    vanillaPairsRestored++;
-                }
             }
         }
 
