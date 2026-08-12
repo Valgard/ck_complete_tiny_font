@@ -152,9 +152,7 @@ namespace CompleteTinyFont
             byte[] matrix = kerningAsset.bytes;
             if (matrix == null || matrix.Length != Cells * Cells)
             {
-                Debug.LogWarning(
-                    $"[{CompleteTinyFontMod.Name}] kerning matrix has unexpected length: {matrix?.Length ?? 0}, expected {Cells * Cells}"
-                );
+                Debug.LogWarning($"[{CompleteTinyFontMod.Name}] kerning matrix has unexpected length: {matrix?.Length ?? 0}, expected {Cells * Cells}");
                 return;
             }
 
