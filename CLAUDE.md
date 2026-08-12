@@ -18,9 +18,16 @@ shared with the sibling mods.
 ## Build and deploy
 
 ```bash
-source .envrc           # or, from a worktree: source ../../../.envrc && source .envrc
+source .envrc           # only needed without direnv; direnv auto-loads on cd
 ../utils/build.sh       # Unity batchmode build; on Darwin auto-runs install-macos.sh
 ```
+
+From a git worktree (`.worktrees/<branch>`, two levels below the mod root)
+**both** paths need the same three-level correction — `source ../../../.envrc
+&& source .envrc` and `../../../utils/build.sh`. Correcting only one of them is
+the trap: sourcing just the mod's own `.envrc` there leaves every machine-level
+variable unset without a warning, and has already shipped a build with an empty
+localisation table (parent `README.md` § Build & install).
 
 Unity Editor must be closed (it locks the project). `utils/link.sh` symlinks
 the repo's `unity/` mirror into `$SDK_PATH/Assets/`; `build.sh` invokes it
