@@ -4,12 +4,12 @@ Prüfung der handgepixelten Vollausbau-Variante von thinTiny (alle thinSmall-Gly
 
 | | |
 |---|---|
-| **Geprüfter Stand** | Dateidatum 2026-08-11 19:15 (36 350 Bytes) — *Revision 12* |
-| Vorstände | 19:12 = Rev. 11 · 19:01 = Rev. 10 · 18:56 = Rev. 9 · 18:32 = Rev. 8 · 18:26 = Rev. 7 · 18:20 = Rev. 6 · 18:09 = Rev. 5 · 17:37 = Rev. 4 · 17:21 = Rev. 3 · 15:37 = Rev. 2 · 2026-08-10 = Rev. 1 |
-| **Fazit** | **fertig — kein offener Punkt.** Kein Defekt; die Grundsatzfrage aus § 8 ist entschieden: **Vollersatz** |
+| **Geprüfter Stand** | 37 057 Bytes, `sha256 d72fc1a4…` — *Revision 13* |
+| Vorstände | 2026-08-11 19:15 (36 350 B) = Rev. 12 · 19:12 = Rev. 11 · 19:01 = Rev. 10 · 18:56 = Rev. 9 · 18:32 = Rev. 8 · 18:26 = Rev. 7 · 18:20 = Rev. 6 · 18:09 = Rev. 5 · 17:37 = Rev. 4 · 17:21 = Rev. 3 · 15:37 = Rev. 2 · 2026-08-10 = Rev. 1 |
+| **Fazit** | **fertig — kein offener Punkt.** Kein Defekt; die Grundsatzfrage aus § 8 ist entschieden (**Vollersatz**) und als Mod `Complete Tiny Font` veröffentlicht |
 
 **Fazit:** Die Font ist **defektfrei**. Abdeckung vollständig (331/331 Codepoints), Metrik
-durchgehend konsistent, keine Regression über zwölf Revisionen. Jeder in diesem Dokument
+durchgehend konsistent, keine Regression über dreizehn Revisionen. Jeder in diesem Dokument
 festgehaltene Befund ist entweder **behoben** oder als **bewusste, begründete Ausnahme**
 dokumentiert.
 
@@ -26,9 +26,17 @@ ist CK-konform), ein einziger Weißton, keine Layer-Fremdfarbe, kein Pixel auße
 Rect-Box, kein Pixel mit Alpha < 255.
 
 **Die Grundsatzfrage aus § 8 ist entschieden: Vollersatz** — alle 331 Glyphen werden in
-thinTiny injiziert. Damit werden CK's Schadens- und Punktzahlen 1 px flacher; dafür ist die
-Font in sich stimmig, und die schmalen Buchstaben (`C E F L`) werden lesbarer als im Original.
-Nächste Schritte sind die drei Anpassungen an `pixaki_to_glyphs.py` (§ 9).
+thinTiny injiziert. Damit werden CK's Punktzahlen 1 px flacher; dafür ist die Font in sich
+stimmig, und die schmalen Buchstaben (`C E F L`) werden lesbarer als im Original.
+**Umgesetzt und veröffentlicht** als Mod `Complete Tiny Font` — die in § 9 geplanten
+Pipeline-Änderungen sind erledigt (siehe die Notiz dort).
+
+> **Korrektur zu „Schadenszahlen" (Revision 13).** Dieses Dokument hat mehrfach behauptet, der
+> Vollersatz mache CK's *Schadens*zahlen flacher. Er tut es nicht: `CombatText.prefab` nutzt
+> `thinSmall`, nicht thinTiny, und CK's eigener Zweig `isDamageNumber → SetDefaultFont(thinTiny)`
+> läuft ins Leere, weil das Rendering `style.fontFace` liest, jener Setter aber nur
+> `defaultStyle.fontFace` schreibt. Betroffen sind die Inventar-/Rezept-Zahlen, der Stapel-Zähler
+> am Boden und die Punktzahl — gemessen an den Prefabs, nicht abgeleitet.
 
 ---
 
@@ -59,7 +67,7 @@ lateinischen `M`/`m` (§ 5.4, § 5.5).
 | Zellraster | 8 × 12 (thinSmall-`charDims`), 32 Spalten × 12 Zeilen = 384 Zellen |
 | Bemalte Zellen | **337** — in *jeder* Zeile deckungsgleich mit der thinSmall-Referenz |
 | Rect-Boxen | **337** — genau eine je bemalter Zelle (Rev. 1/2: 341, mit 4 Waisen-Slots, § 6) |
-| Rect-Geometrie | **(y = 1, h = 10) bei allen 337**, x-Offset 0 bei allen — seit Rev. 2 vollständig einheitlich |
+| Rect-Geometrie | **(y = 0, h = 10) bei allen 337**, x-Offset 0 bei allen — einheitlich seit Rev. 2, auf y = 0 gesetzt in Rev. 13 (§ 5.1) |
 | Layer (Rev. 3) | `Background`, `Dims`, `Rects`, `Atlas`, `Layer 1` (156 px Hilfsstreifen, jetzt sichtbar) |
 | Layer (Rev. 1) | zusätzlich ein unsichtbarer `thinSmall`-Referenzlayer und ein leerer `thinTiny`-Layer |
 
@@ -77,7 +85,11 @@ des Quelldokuments spielt bei der Extraktion keine Rolle, nur die `Rects`-Box z�
 `cell(Spalte, Zeile)` — Spalte 0…31 von links nach rechts, Zeile 0…11 von **oben** nach
 unten. Zelle → Pixelbereich: `x = Spalte × 8`, `y = Zeile × 12`. Pixelpositionen innerhalb
 einer Zelle sind `(x, y)`, y von der Zellenoberkante nach unten. Die Rect-Box liegt auf
-y = 1…10.
+y = 0…9 (bis Revision 12: y = 1…10, siehe § 5.1). Die beiden untersten Zellzeilen bleiben frei
+und dürfen es bleiben: Zeile 10 ist die Leerzeile, die die Extraktion an den Sprite-Ausschnitt
+anhängt (sie wird gerendert, aber vom Kerning nicht gemessen), Zeile 11 fällt bei
+`InitCodePoints` ganz weg. Ein Pixel in einer der beiden ist deshalb ein Defekt — seit
+Revision 13 lehnt `pixaki_to_glyphs.py` ihn ab, statt ihn stillschweigend abzuschneiden.
 
 > **Der `Rects`-Layer trägt zwei Bedeutungen gleichzeitig.** `pixaki_to_glyphs.py` nutzt
 > seine Bounding-Box sowohl als **Sprite-Ausschnitt** aus dem Atlas als auch als
@@ -457,6 +469,17 @@ Revision 1 dieses Dokuments hatte den Versatz als harmlos eingeordnet (Box und G
 gemeinsam verschoben, relativ also korrekt) — das bleibt richtig, vereinheitlicht ist aber
 klar besser. Die unveränderten Luft-unten-Werte belegen, dass nichts verrutscht ist.
 
+> **In Revision 13 überholt: alle 337 Boxen liegen jetzt auf `(y = 0, h = 10)`.** Nicht weil
+> y = 1 falsch gesetzt war — die Vereinheitlichung oben war richtig —, sondern weil die eine
+> freie Zellzeile am *falschen Ende* lag. CK's `PugFont.InitCodePoints` verwirft die unterste
+> Zeile des übergebenen Rects bedingungslos (`rect2 = (y + 1, h - 1)`), also fehlte jeder
+> Glyphe ihre letzte Zeile und die ganze Font stand im Spiel 1 px zu tief; bei 15 Zeichen war
+> zusätzlich das Diakritikum oben abgeschnitten. Beobachtet im Spiel, nicht aus dem Code
+> abgeleitet. Der Master wanderte deshalb um 1 px nach oben (Zeilen 10 und 11 frei), und die
+> Extraktion übergibt ein um genau diese eine Leerzeile höheres Rect. Wer die Boxen wieder auf
+> y = 1 setzt, holt den Fehler zurück: `pixaki_to_glyphs.py` (`BOX_Y = 0`, Commit `8bd9b77`)
+> und `ThinTinyFontPatch.cs` (`RectH = BoxH + 2`, Commit `2b3b782`) rechnen mit y = 0.
+
 ### 5.2 `Р` (18,9) von `P` unterschieden — in zwei Schritten (Rev. 2 und 3)
 
 Dieser Punkt stand ursprünglich unter „kein Defekt", weil `P` und `Р` derselbe Buchstabe sind
@@ -664,7 +687,9 @@ Die Alternativen im Vergleich:
 
 - **Vollersatz (gewählt)** — in sich stimmig und optisch eine leichte Verbesserung gegenüber
   CK's Original. Preis: CK's Schadens- und Punktzahlen werden 1 px flacher, da Vanilla thinTiny
-  ausschließlich dafür verwendet.
+  ausschließlich dafür verwendet. **Diese Begründung war falsch** — die Schadenszahlen stehen
+  in `thinSmall` und bleiben unberührt; die Entscheidung selbst bleibt richtig, sie kostet nur
+  weniger als hier angenommen (Korrektur in Revision 13, oben im Fazit).
 - **Nur die 217 fehlenden Glyphen (verworfen)** — hätte Vanilla unberührt gelassen, aber ein
   6 px hohes `A` neben ein 5 px hohes `Ä` im selben Wort gestellt. Der Stilbruch wiegt schwerer
   als der Pixel.
@@ -678,6 +703,15 @@ werden (§ 9, Punkt 2), damit auch die 114 Glyphen extrahiert werden, die thinTi
 ---
 
 ## 9. Nötige Änderungen an der Pipeline
+
+> **Stand Revision 13: erledigt, und der Abschnitt beschreibt einen überholten Ort.** Alle drei
+> Punkte sind umgesetzt; das Werkzeug liegt nicht mehr bei den Glyph-Templates, sondern als
+> geteiltes `pixaki_to_glyphs.py` neben den übrigen Mod-Skripten (mit eigener Testsuite), und
+> die Runtime-Seite heißt `ThinTinyFontPatch.cs` in dieser Mod — `ThinTinyGlyphPatch.cs` in
+> item-checklist ist gelöscht. Zwei Dinge kamen hinzu, die diese Planung noch nicht kannte: das
+> Rect wird um eine Leerzeile höher übergeben (§ 5.1), und das Kerning wird aus den Ink-Spalten
+> dieses Atlas erzeugt statt von thinTiny geerbt. Der Rest des Abschnitts bleibt als
+> Planungsstand von Revision 12 stehen.
 
 `item-checklist/sources/glyph-templates/pixaki_to_glyphs.py` wurde für das Iter-25-Dokument
 geschrieben (Canvas in thinTiny-Größe, Zellen 8 × 10). Für diese Datei braucht es:
@@ -723,6 +757,16 @@ Alphabet und Groß-/Kleinschreibung; Formkollisionen über Pixelsignatur-Verglei
 dieser Font, verschieden im Original); **Grundform-Konsistenz** und **Akzent-Typ-Konsistenz**
 (beide unten); Akzentpositionen je Akzenttyp; Farbtöne (§ 7.1); Pixel-Diff gegen die
 Vorrevision; **Fremdfarben-Abgleich** (unten).
+
+> **Vier dieser Kriterien prüft seit Revision 13 die Pipeline selbst.** `pixaki_to_glyphs.py
+> --check-only` bricht ab, wenn Rect-Geometrie (y, Höhe, x-Offset), die Deckung von Rect-Boxen
+> und bemalten Zellen oder die Ink-Grenzen verletzt sind; der aktuelle Master meldet
+> `OK — 337 painted cells, all invariants hold`. Das ist mehr als Bequemlichkeit: der
+> Überstands-Test war bis dahin nur *hier* als Kriterium notiert, während der Extraktor
+> überstehende Pixel stillschweigend abschnitt — die Prüfung hing also an dieser Handarbeit,
+> und ein Überstand hätte im Kerning-Wert seines Nachbarn weitergewirkt, ohne irgendwo
+> aufzufallen. Die übrigen Kriterien (Formkollision, Grundform, Akzenttypen, Fremdfarben)
+> bleiben Handarbeit gegen die Referenzatlanten.
 
 **Grundform-Konsistenz — das produktivste Kriterium.** Ein akzentuiertes Zeichen muss seine
 unakzentuierte Grundform unverändert tragen; ein kyrillisches Zeichen, das CK identisch zu
@@ -826,3 +870,4 @@ schnell auf „Versehen" geschlossen (§ 4.2).
 | 10 | 2026-08-11 | `ê` (9,5) gefixt — Zirkumflex wieder identisch zu `â î ô û`. Auf Nachfrage zusätzlich die **Ogonek-Familie** geprüft: kein Konflikt mit der neuen Cedille, Komma und Ogonek sind exakte Spiegelbilder. Dabei gefunden: `Ą` trug eine andere Ogonek-Form als `ą` (§ 4.4). |
 | 11 | 2026-08-11 | `Ą` (7,6) an `ą` angeglichen — die Ogonek-Gruppierung entspricht jetzt CK (`Ą ą Ę ę` waagerecht, `Į į` ein Pixel, `Ų ų` Diagonale). **Kollateral:** ein Pixel (3,2) im Akut von `Ŕ`, der gleich drei Prüfungen auslöste — Überstand über die Rect-Box, gebrochene Akut-Gruppenform und erstmals ein negativer rechter Gap. |
 | 12 | 2026-08-11 | `Ŕ` (16,11) gefixt. **Die Font ist wieder defektfrei** — und gegenüber Revision 8 zusätzlich um die Differenzierung der drei Diakritika unten verbessert. Alle Prüfungen grün: keine Formkollision, neun Akzenttypen oben einheitlich, drei Diakritika unten getrennt, 44/44 Akzent/Basis-Paare, 336/337 ohne rechte Lücke, ein Weißton, keine Fremdfarbe, kein Überstand, kein Alpha < 255. **§ 8 entschieden: Vollersatz.** |
+| 13 | 2026-08-12 | Prüfung gegen den Stand nach dem Vertikalversatz (37 057 B, `sha256 d72fc1a4…`). **Geometrie geändert:** alle 337 Rect-Boxen von `(y = 1, h = 10)` auf `(y = 0, h = 10)`, die freie Zellzeile wandert damit von oben nach unten (§ 2, § 5.1). Auslöser war ein **im Spiel beobachteter** Defekt, den keine Prüfung dieses Dokuments finden konnte, weil er nicht in der Datei lag: `PugFont.InitCodePoints` verwirft die unterste Zeile des Rects, also stand die ganze Font 1 px zu tief und 15 Diakritika waren oben abgeschnitten. Gegenstück in der Extraktion ist ein um eine Leerzeile höheres Rect. **Korrektur:** die Behauptung, der Vollersatz mache CK's *Schadens*zahlen flacher, war falsch — die stehen in `thinSmall` (Fazit, § 8). **§ 9 als erledigt und ortsveraltet markiert.** Neu in § 10: vier Kriterien prüft jetzt die Pipeline selbst, darunter der Überstands-Test, der bis dahin nur hier notiert war, während der Extraktor Überstände stillschweigend abschnitt. Die Font selbst bleibt **defektfrei**; kein Glyph wurde inhaltlich angefasst. |
