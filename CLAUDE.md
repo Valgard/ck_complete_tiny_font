@@ -30,11 +30,19 @@ idempotently on every run, so worktree switches and repo moves self-heal.
 `CoreKeeperModSDK` clone with a single `UnityLockfile`. If another session is
 building, wait for the lock to release — do not kill it.
 
-No automated tests — verification is a manual in-game check: look for the
-small numbers on inventory/recipe slots and dropped-item stacks, and confirm
-an accented or Cyrillic character (previously borrowed from the Chinese font
-and visibly deformed) now renders as this mod's own glyph, at the same
-spacing as before.
+No automated tests. The cheapest check is the mod's own log line: after a
+build reloads, `Player.log` should show `[Complete Tiny Font] thinTiny
+replaced: 331 codepoints from a 257x144 atlas; kerning 337 rows`
+(`TryApply()` in `ThinTinyFontPatch.cs`). A missing or different-looking line
+means the running session is on a stale build, not a new bug — diagnosing
+that once cost a full fix round when a screenshot showed "no change" for
+exactly this reason. The codepoint count also drops if the `Widths` constant
+is pasted at the wrong length, so the same line doubles as a free detector
+for that mistake. Then verify visually: look for the small numbers on
+inventory/recipe slots and dropped-item stacks, and confirm an accented or
+Cyrillic character (previously borrowed from the Chinese font and visibly
+deformed) now renders as this mod's own glyph, at the same spacing as
+before.
 
 ## Architecture
 
