@@ -246,6 +246,20 @@ column's advance leaves room for the 2 px outline padding CK adds — at x=248
 on a 257 px canvas that caps it at 6, and exceeding it costs an error log line
 per glyph on every launch.
 
+**The atlas's import settings are load-bearing**, and a regenerated PNG is
+imported by whatever `.meta` sits beside it. `thinTiny_full.png.meta` must keep
+`textureType: 8` (Sprite) with `spriteMode: 1` — the ModBuilder sprite trap:
+with Unity's texture defaults instead, the asset still builds into the bundle,
+but `bundle.LoadAsset<Sprite>` returns null and the mod logs `atlas sprite not
+found in bundle` and leaves `thinTiny` vanilla. Point filtering
+(`filterMode: 0`) keeps the pixels crisp, and `nPOTScale: 0` plus the
+uncompressed 2048 platform settings are what keep the texture at exactly
+257×144 — anything that rescales or pads it now trips the geometry check in
+`TryApply()` instead. The committed `.meta` has all of this; the risk is a
+replacement `.meta`, not the shipped one. (The only other in-repo statement of
+this sits in `sources/thinTiny-review.md` § 9, inside a block whose own banner
+declares it a superseded planning snapshot.)
+
 The `Widths` string in `ThinTinyFontPatch.cs` is generated output too —
 regenerate and re-paste it from the same master rather than hand-editing a
 digit; see that class's own doc comment for what each digit encodes. Forgetting
