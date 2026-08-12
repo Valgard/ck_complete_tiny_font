@@ -115,20 +115,44 @@ Rebuilding `glyphData` drops vanilla's own `kerning` byte arrays entirely, so
 text would render wider than vanilla with no correction at all.
 `ApplyKerning()` loads a generated `Cells × Cells` byte matrix
 (`thinTiny_kerning.bytes`, 384 × 384 = 147,456 bytes) derived from this
-atlas's own ink columns — the smallest gap between two glyphs' painted rows,
-clamped to a sane range — and calibrated against vanilla's real kerning table
-to **97.66%** agreement.
+atlas's own ink columns.
 
-It deliberately does **not** then overwrite any pair with vanilla's real
+**The rule** (`kerning_pair()` in `utils/pixaki_to_glyphs.py`): for every
+atlas row where both glyphs have ink, the gap is how far the second glyph's
+ink would sit from the end of the first glyph's advance at zero kerning. The
+kerning value is **one less than the smallest such gap across those shared
+ink rows, clamped to `[0, KERNING_CLAMP]`** (`KERNING_CLAMP = 2`) — never the
+raw gap itself. That "one less" exists so two glyph stems can never touch: an
+earlier revision used the raw gap directly, which reproduced **97.66%** of
+vanilla's own kerning table but let adjacent narrow stems collide outright
+(`l` immediately followed by `t`, both advance 2 — the stems touched in
+"Seltenheit" and "Entdeckt"). The margin-adjusted rule matches only **~84%**
+of vanilla's table, and that is now deliberately not the criterion: vanilla's
+numbers describe vanilla's own (wider) glyph shapes — digits render 6 px
+tall there vs. 5 here, and `C E F L` are 2 px wide there vs. 3 — so agreement
+with a different set of shapes was never proof of correctness for this one.
+Collision-freedom on these glyphs is the bar, and leaving one column of air
+is what clears it. An in-game experiment raised `KERNING_CLAMP` to 3 to see a
+wider look; it changed only low-ink punctuation/symbol pairs (1,071 of them),
+never a single letter or digit, so the difference was invisible in ordinary
+text and the clamp was settled back at 2 (fix: `4d0361c` parent /
+`130d543` mod repo; rejected experiment: `8792598` parent / `7acf3e0` mod
+repo).
+
+One side effect the margin buys for free: because it is uniform across every
+glyph pair, digit-to-digit kerning no longer varies by which two digits are
+adjacent, so a counter or coordinate display no longer subtly changes total
+width as its digits change — the raw-gap variant did not guarantee that.
+
+It also deliberately does **not** overwrite any pair with vanilla's real
 value. Kerning describes the side bearings of specific glyph shapes, and this
 build's glyphs differ from vanilla's own in exactly the ways that matter for
-that number: digits are 5 px tall here vs. 6 in vanilla, and `C E F L` are
-3 px wide here vs. 2. Importing vanilla's numbers would be systematically
-wrong for a different set of shapes, not "more faithful" — the 97.66% figure
-validates the generation *rule*, not a reason to fall back to vanilla's data.
-(An earlier revision did restore vanilla's real pairs on top of the generated
-matrix; it was removed once this was understood — see git history around
-`005617e`.)
+that number, as above. Importing vanilla's numbers would be systematically
+wrong for a different set of shapes, not "more faithful" — the percentages
+above validate the generation *rule*, not a reason to fall back to vanilla's
+data. (An earlier revision did restore vanilla's real pairs on top of the
+generated matrix; it was removed once this was understood — see git history
+around `005617e`.)
 
 ### Regenerating the atlas and kerning matrix
 
