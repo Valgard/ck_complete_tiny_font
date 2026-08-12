@@ -743,7 +743,8 @@ verglichen gegen:
 - `rrsthin8_raw.png` — das ausgelieferte thinSmall-Atlas
 - `rrs5_raw.png` — das ausgelieferte thinTiny-Atlas
 
-alle drei in `item-checklist/sources/glyph-templates/`.
+alle drei in `sources/glyph-templates/` (bis Revision 12 in `item-checklist/`, mit dem
+Master hierher verschoben; die Dateien selbst sind Pugstorm-Daten und bleiben ungetrackt).
 
 Die Zuordnung Zelle → Zeichen folgt der thinSmall-Anordnung:
 `col = rect.x // 8`, `row = 11 - (rect.y // 12)` (thinSmall-Rects liegen in

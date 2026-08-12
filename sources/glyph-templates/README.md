@@ -53,7 +53,10 @@ for how to re-add it if the glyph set ever needs regenerating.
 
 ## Pixaki master layers (`thinTiny.pixaki`)
 
-4 layers + a thinSmall reference: **Atlas** = the glyph sprites, **Rects** = the
-per-glyph advance width (full charDims height 10, glyph-specific width), **charDims** =
-the nominal-cell checkerboard, **Background** = cyan. Extraction maps each codepoint
-to its thinSmall cell (col = x//8, row from top). See `docs/research/pixaki-format.md`.
+**Atlas** = the glyph sprites, **Rects** = the per-glyph advance box (height 10 at cell
+row 0, glyph-specific width), **Dims** = the nominal-cell checkerboard, **Background** =
+cyan, plus a `Layer 1` helper strip. The thinSmall reference layer the master started with
+was removed in revision 2 — comparisons run against `rrsthin8_raw.png` instead. Extraction
+maps each codepoint to its thinSmall cell (col = x//8, row from top). The file format is
+documented in `item-checklist/docs/research/pixaki-format.md` (it predates this repo and
+still serves that mod's own Pixaki sprite pipeline).

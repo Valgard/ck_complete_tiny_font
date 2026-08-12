@@ -201,6 +201,17 @@ clip silently and then measure the truncated glyph. The `Widths` string in
 from the same master rather than hand-editing a digit; see that class's own
 doc comment for what each digit encodes.
 
+`sources/glyph-templates/` holds the reference material for glyph work: two
+tracked tools (`dump_log_to_json.py`, `build_glyph_grids.py`) and, beside
+them, CK's own extracted font atlases plus `glyph_metrics.json` and the
+`grids/` debug overlays. Those data files are Pugstorm assets and stay
+**gitignored**, so a fresh clone gets the tools and an otherwise empty
+directory — that is expected, not a broken checkout. `glyph_metrics.json`
+can only be re-dumped from a running game (see that directory's `README.md`);
+none of it is needed to regenerate the shipped atlas, which reads the Pixaki
+master alone. The whole directory came over from `item-checklist` with the
+master, where the glyph set originated.
+
 ## macOS / CrossOver
 
 Deployed through the fake-mod.io workaround (see parent `../CLAUDE.md`). This
