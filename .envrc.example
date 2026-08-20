@@ -43,3 +43,8 @@ export MOD_REPO_ROOT="$PWD"
 # Visual, Audio, Item, NPC, Quality of Life, Overhaul, Language, World,
 # Library, Other.
 export CK_MODIO_TYPE="Visual|Language|Library"
+
+# Forum tags for this mod's thread in the Core Keeper Discord's
+# #available-mods channel — PIPE-separated, because "Misc / Other" contains
+# spaces. Read by utils/discord_post.py; Discord allows at most five.
+export CK_DISCORD_TAGS="Utilities|Misc / Other"
