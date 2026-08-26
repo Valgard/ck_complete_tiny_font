@@ -1,0 +1,19 @@
+[h1]Complete Tiny Font[/h1]
+
+Core Keeper's small font — used for the little numbers on inventory slots, recipe lists, and stack sizes on items lying on the ground — ships with a reduced character set: digits, plain ASCII, and a handful of symbols. Type any accented character, or Cyrillic, and the game silently borrows a glyph from its Chinese font instead — the wrong size, and visibly deformed.
+
+This mod replaces that font with a complete, hand-drawn 331-character build: full Western European, partial Eastern European, Cyrillic, and typographic punctuation, all matching the original's proportions, with kerning generated for every glyph.
+
+[b]Digits keep their exact original widths.[/b] Counters and stack labels don't shift position — they just render one pixel flatter. Letters are redrawn too, and 25 of them are a pixel or two wider than before (most noticeably m and M); vanilla barely uses this font for letters, so in practice you're unlikely to see it.
+
+[b]Client-side only.[/b] This only changes how text is drawn on your own screen, so it never stops you from joining a server that doesn't have it — you'll just see the improved characters and other players won't.
+
+No settings, and nothing to configure — subscribe and it works immediately. It's also safe to remove at any time: this mod only replaces the character data one font loads, so unsubscribing puts the small font straight back to vanilla's reduced set.
+
+[h2]Requirements[/h2]
+
+None. This mod works entirely on its own — no other Workshop items needed.
+
+[hr][/hr]
+
+Built with the official Pugstorm Core Keeper Mod SDK. Personal-use, non-commercial (Core Keeper EULA). Not affiliated with or endorsed by Pugstorm.
