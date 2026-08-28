@@ -10,10 +10,6 @@ This mod replaces that font with a complete, hand-drawn 331-character build: ful
 
 No settings, and nothing to configure — subscribe and it works immediately. It's also safe to remove at any time: this mod only replaces the character data one font loads, so unsubscribing puts the small font straight back to vanilla's reduced set.
 
-[h2]Requirements[/h2]
-
-None. This mod works entirely on its own — no other Workshop items needed.
-
 [hr][/hr]
 
 Built with the official Pugstorm Core Keeper Mod SDK. Personal-use, non-commercial (Core Keeper EULA). Not affiliated with or endorsed by Pugstorm.
