@@ -288,6 +288,14 @@ none of it is needed to regenerate the shipped atlas, which reads the Pixaki
 master alone. The whole directory came over from `item-checklist` with the
 master, where the glyph set originated.
 
+## Not yet built
+
+`docs/roadmap.md` carries one point, and it is not code: this mod has no
+picture of itself anywhere. The subject is less obvious than it looks — the
+slot numbers are where the font changes *least*, so what has to be shown is an
+accented or Cyrillic character, before and after. The roadmap records what is
+already settled about that and what is still open.
+
 ## macOS / CrossOver
 
 Deployed through the fake-mod.io workaround (see parent `../CLAUDE.md`). This
