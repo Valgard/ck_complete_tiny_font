@@ -10,6 +10,19 @@ repos:
                 - pre-commit
                 - pre-push
 
+          # The checker lives in the parent repo, not here: this mod repo sits
+          # inside it and already reaches for ../utils/ to build and link. It
+          # takes this repo's root, so the scope is `git ls-files` here.
+          - id: docs-links
+            name: docs links
+            entry: uv run --frozen --project .. ../utils/check_docs_links.py .
+            language: system
+            pass_filenames: false
+            files: \.md$
+            stages:
+                - pre-commit
+                - pre-push
+
           # The atlas, the kerning matrix and the hand-pasted Widths constant
           # must all come from the same revision of the Pixaki master, and
           # nothing else in the build compares them. The guard is a test in the
