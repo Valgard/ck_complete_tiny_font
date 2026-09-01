@@ -45,19 +45,18 @@ geometry and kerning rules). Run both with `uv run pytest utils/tests -q` from
 the parent. Neither can tell you whether the font *renders*, which is why the
 in-game check below still matters.
 
-The cheapest such check is the mod's own log line: after a
-build reloads, `Player.log` should show `[Complete Tiny Font] thinTiny
-replaced: 331 codepoints from a 257x144 atlas; kerning 337 rows`
-(`TryApply()` in `ThinTinyFontPatch.cs`). A missing or different-looking line
-means the running session is on a stale build, not a new bug — diagnosing
-that once cost a full fix round when a screenshot showed "no change" for
-exactly this reason. The codepoint count also drops if the `Widths` constant
-is pasted at the wrong length, so the same line doubles as a free detector
-for that mistake. Then verify visually: look for the small numbers on
-inventory/recipe slots and dropped-item stacks, and confirm an accented or
-Cyrillic character (previously borrowed from the Chinese font and visibly
-deformed) now renders as this mod's own glyph, at the same spacing as
-before.
+The cheapest such check is the mod's own log line: after a build reloads,
+`Player.log` should show `[Complete Tiny Font] thinTiny replaced: 331 codepoints
+from a 257x144 atlas; kerning 337 rows` (`TryApply()` in
+`ThinTinyFontPatch.cs`). A missing or different-looking line means the running
+session is on a stale build, not a new bug — diagnosing that once cost a full
+fix round when a screenshot showed "no change" for exactly this reason. The
+codepoint count also drops if the `Widths` constant is pasted at the wrong
+length, so the same line doubles as a free detector for that mistake. Then
+verify visually: look for the small numbers on inventory/recipe slots and
+dropped-item stacks, and confirm an accented or Cyrillic character (previously
+borrowed from the Chinese font and visibly deformed) now renders as this mod's
+own glyph, at the same spacing as before.
 
 ## Architecture
 

@@ -1,6 +1,7 @@
 # #thinTiny.pixaki` — Qualitätsprüfung
 
-Prüfung der handgepixelten Vollausbau-Variante von thinTiny (alle thinSmall-Glyphen), `thinTiny.pixaki`.
+Prüfung der handgepixelten Vollausbau-Variante von thinTiny (alle thinSmall-Glyphen),
+`thinTiny.pixaki`.
 
 | | |
 |---|---|
