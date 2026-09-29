@@ -44,3 +44,4 @@ unity/CompleteTinyFont/Editor/LocalizationGenerator.cs.meta
 sources/glyph-templates/*
 !sources/glyph-templates/*.py
 !sources/glyph-templates/README.md
+.worktrees/
