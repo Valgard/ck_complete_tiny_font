@@ -298,9 +298,9 @@ already settled about that and what is still open.
 ## macOS / CrossOver
 
 Deployed through the fake-mod.io workaround (see parent `../CLAUDE.md`). This
-mod's fake mod.io ID is **`9999987`**. Do not open the in-game Mods menu
-while a fake-ID install is active; re-run `../utils/build.sh` to restore if
-the cache is wiped.
+mod's fake mod.io ID is **`9999987`**. Do not open the in-game Mods menu while a
+fake-ID install is active; re-run `../utils/build.sh` after any visit to it,
+because merely opening it unregisters the install even though its files stay.
 
 ## Publishing to mod.io
 
