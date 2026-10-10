@@ -45,3 +45,7 @@ sources/glyph-templates/*
 !sources/glyph-templates/*.py
 !sources/glyph-templates/README.md
 .worktrees/
+
+# Superpowers process artifacts: plans, scratch and the subagent workspace
+docs/superpowers/
+/.superpowers/
